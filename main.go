@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	// "regexp"
 	p "expert_system_42/parser"
 )
 
@@ -16,7 +15,10 @@ func initializeElementsMap(input *p.Input, step int) {
 
 func applyRules(input *p.Input, step int) {
 	for _, rule := range input.Rules{
+		fmt.Println("---------------")
 		fmt.Println("Rule:", rule)
+
+		fmt.Println(input.Elements)
 	}
 }
 
@@ -30,7 +32,6 @@ func main() {
 	input := p.ParseInput()
 	for step := range input.Queries{
 
-		// Initialize map with Rules
 		initializeElementsMap(&input, step)
 
 		// Handle Inital facts

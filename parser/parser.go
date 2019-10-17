@@ -17,8 +17,14 @@ const (
 type Input struct {
 	InitialFacts []string
 	Queries      []string
-	Rules        []string
+	Rules        []Rule
 	Elements     map[string]int
+}
+
+type Rule struct {
+	Condition   string
+	Conclusion  string
+	DoubleArrow bool
 }
 
 func checkError(e error) {
@@ -91,6 +97,19 @@ func initializeElementsMap(input *Input, line *string) {
 	}
 }
 
+func formatRule(line string) *Rule {
+	r := Rule{}
+	if strings.Contains(line, "<=>") {
+		r.DoubleArrow = true
+	}
+	line = strings.ReplaceAll(line, "<", "")
+	line = strings.ReplaceAll(line, ">", "")
+	index := strings.Index(line, "=")
+	r.Condition = line[:index]
+	r.Conclusion = line[index+1:]
+	return &r
+}
+
 func ParseInput() Input {
 
 	f, err := os.Open(os.Args[1])
@@ -123,7 +142,8 @@ func ParseInput() Input {
 		// Append rule / facts / query
 		if readingRules {
 			checkRuleSyntax(&line)
-			input.Rules = append(input.Rules, line)
+			r := formatRule(line)
+			input.Rules = append(input.Rules, *r)
 		} else {
 			if isFact {
 				input.InitialFacts = append(input.InitialFacts, line[1:])
