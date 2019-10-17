@@ -1,0 +1,5 @@
+# Error Syntax 0
+
+=> A
+# Result should be
+# Error

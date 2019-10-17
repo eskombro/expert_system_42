@@ -1,0 +1,16 @@
+# Hard Not
+
+A => B
+!!!!!A => B
+
+=
+?B
+# Result should be
+# B:True
+
+C => !D
+
+=C
+?D
+# Result should be
+# D:False

@@ -1,0 +1,9 @@
+# Error Syntax 7
+
+A + B > C
+
+?A
+=C
+
+# Result should be
+# Error

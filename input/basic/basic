@@ -1,0 +1,8 @@
+# Basic
+
+A + B => C
+
+=AB
+?C
+# Result should be
+# C:True

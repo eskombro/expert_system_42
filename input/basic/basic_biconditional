@@ -1,0 +1,13 @@
+# Basic Biconditional
+
+A <=> B
+
+=B
+?A
+# Result should be
+# A:True
+
+=A
+?B
+# Result should be
+# B:True

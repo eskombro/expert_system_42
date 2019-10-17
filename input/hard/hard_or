@@ -1,0 +1,13 @@
+# Hard OR
+
+B + C => A
+D | E => B
+B => C
+C => E
+A => D
+A => E
+
+=
+?C
+# Result should be
+# C:False

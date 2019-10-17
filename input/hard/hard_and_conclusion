@@ -1,0 +1,10 @@
+# Hard AND conclusion
+
+L + M => K
+O + P => L + N
+N     => M
+
+=OP
+?K
+# Result should be
+# K:True

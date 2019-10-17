@@ -1,0 +1,24 @@
+# Multiple same conclusion rule
+
+B => A
+C => A
+
+=
+?A
+# Result should be
+# A:False
+
+=B
+?A
+# Result should be
+# A:True
+
+=C
+?A
+# Result should be
+# A:True
+
+=BC
+?A
+# Result should be
+# A:True

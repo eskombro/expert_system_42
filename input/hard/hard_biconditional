@@ -1,0 +1,10 @@
+# Hard biconditional
+
+A + B <=> C | D
+
+=D
+?ABC
+# Result should be
+# A:True
+# B:True
+# C:True
