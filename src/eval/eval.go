@@ -1,7 +1,7 @@
 package eval
 
 import (
-	l "expert_system_42/logger"
+	l "expert_system_42/src/logger"
 	"fmt"
 	"regexp"
 	"strings"

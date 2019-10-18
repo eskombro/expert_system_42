@@ -1,9 +1,9 @@
 package main
 
 import (
-	ev "expert_system_42/eval"
-	l "expert_system_42/logger"
-	p "expert_system_42/parser"
+	ev "expert_system_42/src/eval"
+	l "expert_system_42/src/logger"
+	p "expert_system_42/src/parser"
 	"fmt"
 	"os"
 	"regexp"
@@ -21,7 +21,7 @@ func initializeElementsForQuery(input *p.Input, currentQuery int) {
 }
 
 func main() {
-	l.DebugLevel = 0
+	l.DebugLevel = 2
 	fmt.Println("Launching expert system...")
 	if len(os.Args) != 2 {
 		fmt.Println("Error in args. Bye :)")
@@ -99,6 +99,8 @@ func main() {
 							l.Log("  -> "+sq, l.LVL1)
 						} else if strings.Contains(r.Conclusion, m) {
 							l.Log("  There is a AND condition containing "+m, l.LVL1)
+							l.Log("    Not implemented yet ", l.LVL1)
+							break
 						}
 					}
 				}
