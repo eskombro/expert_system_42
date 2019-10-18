@@ -2,48 +2,12 @@ package parser
 
 import (
 	"bufio"
+	graph "expert_system/src/graph"
 	"fmt"
 	"os"
 	"regexp"
 	"strings"
 )
-
-const (
-	FALSE = iota
-	TRUE
-	UNDEFINED
-)
-
-type Input struct {
-	InitialFacts []string
-	Queries      []string
-	Rules        []Rule
-	Elements     map[string]int
-}
-
-type Rule struct {
-	Condition   string
-	Conclusion  string
-	DoubleArrow bool
-}
-
-func checkError(e error) {
-	if e != nil {
-		fmt.Println("Error:", e.Error())
-		os.Exit(1)
-	}
-}
-
-func throwParsingLineError(e string, line string) {
-	fmt.Println("Error:", e)
-	fmt.Println("     Line:", line)
-	os.Exit(1)
-}
-
-func throwParsingError(e string) {
-	fmt.Println("Error:", e)
-	os.Exit(1)
-}
 
 func cleanLine(line string) string {
 	// Delete comments
@@ -73,35 +37,11 @@ func checkRuleSyntax(line *string) {
 	}
 }
 
-func checkValidInput(input *Input) {
-	// Check every element is present
-	if len(input.Rules) == 0 {
-		throwParsingError("Missing rules in file")
-	}
-	if len(input.InitialFacts) == 0 || len(input.Queries) == 0 {
-		throwParsingError("Missing facts or queries in file")
-	}
-	if len(input.InitialFacts) != len(input.Queries) {
-		throwParsingError("Not coherent count of Initial facts and Queries")
-	}
-}
-
-func initializeElementsMap(input *Input, line *string) {
-	// Create elements in map
-	for _, c := range *line {
-		str := fmt.Sprintf("%c", c)
-		isAlpha := regexp.MustCompile(`^[A-Z]`).MatchString
-		if isAlpha(fmt.Sprint(str)) {
-			input.Elements[str] = FALSE
-		}
-	}
-}
-
-func formatRule(line string) *Rule {
-	r := Rule{}
-	if strings.Contains(line, "<=>") {
-		r.DoubleArrow = true
-	}
+func formatRule(line string) *graph.Rule {
+	r := graph.Rule{}
+	// if strings.Contains(line, "<=>") {
+	// 	r.DoubleArrow = true
+	// }
 	line = strings.ReplaceAll(line, "<", "")
 	line = strings.ReplaceAll(line, ">", "")
 	index := strings.Index(line, "=")
@@ -110,16 +50,56 @@ func formatRule(line string) *Rule {
 	return &r
 }
 
-func ParseInput(filePath string) Input {
+func initializeNodesMap(gr *graph.Graph, line *string) {
+	// Create elements in map
+	for _, c := range *line {
+		str := fmt.Sprintf("%c", c)
+		isAlpha := regexp.MustCompile(`^[A-Z]`).MatchString
+		if isAlpha(fmt.Sprint(str)) {
+			if gr.Nodes[str] == nil {
+				gr.Nodes[str] = &graph.Node{}
+			}
+		}
+	}
+}
+
+func initializeNodesRules(gr *graph.Graph, rules []*graph.Rule) {
+	// Create elements in map
+	for _, r := range rules {
+		isAlpha := regexp.MustCompile(`[A-Z]`)
+		matches := isAlpha.FindAllString(r.Conclusion, -1)
+		// Hanlde AND condition only
+		for _, m := range matches {
+			gr.Nodes[m].Rules = append(gr.Nodes[m].Rules, *r)
+		}
+	}
+}
+
+func checkValidInput(gr *graph.Graph, rules []*graph.Rule) {
+	// Check every element is present
+	if len(rules) == 0 {
+		throwParsingError("Missing rules in file")
+	}
+	if len(gr.Facts) == 0 || len(gr.Queries) == 0 {
+		throwParsingError("Missing facts or queries in file")
+	}
+	if len(gr.Facts) != len(gr.Queries) {
+		throwParsingError("Not coherent count of Initial facts and Queries")
+	}
+}
+
+func ParseInput(filePath string) graph.Graph {
 
 	f, err := os.Open(filePath)
 	checkError(err)
 	defer f.Close()
 
-	input := Input{}
-	input.Elements = make(map[string]int)
+	gr := graph.Graph{
+		Nodes: make(map[string]*graph.Node),
+	}
 	scanner := bufio.NewScanner(f)
 	readingRules := true
+	rules := []*graph.Rule{}
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -143,18 +123,20 @@ func ParseInput(filePath string) Input {
 		if readingRules {
 			checkRuleSyntax(&line)
 			r := formatRule(line)
-			input.Rules = append(input.Rules, *r)
+			rules = append(rules, r)
 		} else {
 			if isFact {
-				input.InitialFacts = append(input.InitialFacts, line[1:])
+				gr.Facts = append(gr.Facts, line[1:])
 			} else if isQuery {
-				input.Queries = append(input.Queries, line[1:])
+				gr.Queries = append(gr.Queries, line[1:])
 			} else {
 				throwParsingLineError("Syntax error after rules", line)
 			}
 		}
-		initializeElementsMap(&input, &line)
+		initializeNodesMap(&gr, &line)
 	}
-	checkValidInput(&input)
-	return input
+	checkValidInput(&gr, rules)
+	initializeNodesRules(&gr, rules)
+	fmt.Println(gr)
+	return gr
 }
