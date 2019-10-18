@@ -110,9 +110,9 @@ func formatRule(line string) *Rule {
 	return &r
 }
 
-func ParseInput() Input {
+func ParseInput(filePath string) Input {
 
-	f, err := os.Open(os.Args[1])
+	f, err := os.Open(filePath)
 	checkError(err)
 	defer f.Close()
 

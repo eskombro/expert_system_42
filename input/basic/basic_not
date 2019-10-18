@@ -21,3 +21,8 @@ B + !C => A
 ?A
 # Result should be
 # A:False
+
+=A
+?A
+# Result should be
+# A:True
