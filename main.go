@@ -1,6 +1,8 @@
 package main
 
 import (
+	ev "expert_system_42/eval"
+	l "expert_system_42/logger"
 	p "expert_system_42/parser"
 	"fmt"
 	"os"
@@ -8,66 +10,66 @@ import (
 	"strings"
 )
 
-func initializeElementsForQuery(input *p.Input, step int) {
+func initializeElementsForQuery(input *p.Input, currentQuery int) {
 	for key := range input.Elements {
 		input.Elements[key] = p.FALSE
 	}
-	for _, c := range input.InitialFacts[step] {
+	for _, c := range input.InitialFacts[currentQuery] {
 		str := fmt.Sprintf("%c", c)
 		input.Elements[str] = p.TRUE
 	}
 }
 
 func main() {
+	l.DebugLevel = 0
 	fmt.Println("Launching expert system...")
 	if len(os.Args) != 2 {
 		fmt.Println("Error in args. Bye :)")
 		os.Exit(1)
 	}
 	input := p.ParseInput(os.Args[1])
-	for step := range input.Queries {
+	for currentQuery := range input.Queries {
 
-		initializeElementsForQuery(&input, step)
+		initializeElementsForQuery(&input, currentQuery)
 
 		// Handle Inital facts
-		fmt.Println("\nFacts:", input.InitialFacts[step])
-		for _, fact := range input.InitialFacts[step] {
+		fmt.Println("\nFacts:", input.InitialFacts[currentQuery])
+		for _, fact := range input.InitialFacts[currentQuery] {
 			f := fmt.Sprintf("%c", fact)
 			input.Elements[f] = p.TRUE
 		}
 
+		fmt.Println("Rules:")
 		for _, r := range input.Rules {
-			fmt.Println(r)
-
+			fmt.Println(" -", r.Condition, "=>", r.Conclusion, ":", r.DoubleArrow)
 		}
 
 		// Handle query
-		q := input.Queries[step]
+		q := input.Queries[currentQuery]
 		fmt.Println("Query:", q)
 		for _, subQuery := range q {
 			sq := fmt.Sprintf("%c", subQuery)
-			fmt.Println("SUB:", sq)
+			l.Log("SUBQUERY: "+sq, l.LVL1)
 			alpha := regexp.MustCompile("[A-Z]")
-			matches := alpha.FindAllString(sq, -1)
 			alphaNot := regexp.MustCompile("![A-Z]")
-			matchesNot := alphaNot.FindAllString(sq, -1)
 
 			for {
 
 				mod := 0
 
-				// Add regex for OR if we know one of them is 1
+				// 1|X or X|1 => 1
 				alphaOrOne := regexp.MustCompile(`([1]\|[A-Z])|([A-Z]\|[1])|([1]\|[1])`)
 				matchesOrOne := alphaOrOne.FindAllString(sq, -1)
 				for _, m := range matchesOrOne {
-					fmt.Println("MatchesOr:", m)
+					l.Log("  MatchesOr: "+m, l.LVL1)
 					mod += strings.Count(sq, m)
 					sq = strings.ReplaceAll(sq, m, "1")
-					fmt.Println("->", sq)
+					l.Log("  -> "+sq, l.LVL1)
 				}
-				matchesNot = alphaNot.FindAllString(sq, -1)
+				// !X if we know X => 0 | 1
+				matchesNot := alphaNot.FindAllString(sq, -1)
 				for _, m := range matchesNot {
-					fmt.Println("MatchesNot:", m)
+					l.Log("  MatchesNot: "+m, l.LVL1)
 					if input.Elements[m[1:]] == 0 {
 						mod += strings.Count(sq, m)
 						sq = strings.ReplaceAll(sq, m, "1")
@@ -75,36 +77,44 @@ func main() {
 						mod += strings.Count(sq, m)
 						sq = strings.ReplaceAll(sq, m, "0")
 					}
-					fmt.Println("->", sq)
+					l.Log("  -> "+sq, l.LVL1)
 				}
-				matches = alpha.FindAllString(sq, -1)
+
+				matches := alpha.FindAllString(sq, -1)
 				for _, m := range matches {
-					fmt.Println("Matches:", m)
+					l.Log("  Matches: "+m, l.LVL1)
+					// X if we know X = 1 => 1
 					if input.Elements[m] == 1 {
-						fmt.Println("We know", m)
+						l.Log("  We know "+m+" value is 1", l.LVL1)
 						mod += strings.Count(sq, m)
 						sq = strings.ReplaceAll(sq, m, "1")
-						fmt.Println("->", sq)
+						l.Log("  -> "+sq, l.LVL1)
 					}
 					for _, r := range input.Rules {
 						// Contains is not good to handle the AND in Conclusion
-						if strings.Contains(r.Conclusion, m) {
-							fmt.Println("there is a rule for", m)
+						if r.Conclusion == m {
+							l.Log("  There is a rule for "+m, l.LVL1)
 							mod += strings.Count(sq, r.Conclusion)
 							sq = strings.ReplaceAll(sq, m, "("+r.Condition+")")
-							fmt.Println("->", sq)
+							l.Log("  -> "+sq, l.LVL1)
+						} else if strings.Contains(r.Conclusion, m) {
+							l.Log("  There is a AND condition containing "+m, l.LVL1)
 						}
 					}
 				}
-				fmt.Println("End round:", sq)
+				// Test if end of search
+				orig := fmt.Sprintf("%c", subQuery)
+				l.Log("  End round: "+sq, l.LVL1)
 				matches = alpha.FindAllString(sq, -1)
 				matchesNot = alphaNot.FindAllString(sq, -1)
 				if mod == 0 && len(matches)+len(matchesNot) > 0 {
-					fmt.Println("FALSE")
+					l.Log("  SOULTION for "+orig+" is FALSE", l.LVL1)
+					fmt.Println(orig, ":", false)
 					break
 				}
 				if len(matches)+len(matchesNot) == 0 {
-					fmt.Println("SOLUTION:", sq)
+					l.Log("  Calculating SOLUTION for "+orig+": "+sq, l.LVL1)
+					fmt.Println(orig, ":", ev.EvalExpression(sq))
 					break
 				}
 			}

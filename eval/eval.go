@@ -1,47 +1,27 @@
 package eval
 
 import (
-	p "expert_system_42/parser"
+	l "expert_system_42/logger"
+	"fmt"
 	"regexp"
 	"strings"
 )
 
-func evalExpression(input *p.Input, r string) bool {
-
-	// HandleParenthesis
-
+func EvalExpression(r string) bool {
+	l.Log(r, l.LVL2)
 	for strings.Contains(r, "(") {
-		subExpr := regexp.MustCompile(`\([A-Z+|^!]+\)`)
+		subExpr := regexp.MustCompile(`\([0-9+|^!]+\)`)
 		m := subExpr.FindAllString(r, -1)
+		l.Log("MATCHED: "+fmt.Sprint(m[0]), l.LVL2)
 		ans := "0"
 		if len(m) > 0 {
-			if evalExpression(input, m[0][1:len(m[0])-1]) {
+			l.Log("Evaluating subexpression: "+m[0][1:len(m[0])-1], l.LVL2)
+			if EvalExpression(m[0][1 : len(m[0])-1]) {
 				ans = "1"
 			}
 			r = strings.ReplaceAll(r, m[0], ans)
 		}
-	}
-
-	// Handle NOT
-	not := regexp.MustCompile("![A-Z]")
-	matches := not.FindAllString(r, -1)
-	for _, m := range matches {
-		if input.Elements[m[1:]] == 0 {
-			r = strings.ReplaceAll(r, m, "1")
-		} else {
-			r = strings.ReplaceAll(r, m, "0")
-		}
-	}
-
-	// Handle Elements
-	alpha := regexp.MustCompile("[A-Z]")
-	matches = alpha.FindAllString(r, -1)
-	for _, m := range matches {
-		if input.Elements[m] == 1 {
-			r = strings.ReplaceAll(r, m, "1")
-		} else {
-			r = strings.ReplaceAll(r, m, "0")
-		}
+		l.Log("CHANGED: "+r, l.LVL2)
 	}
 
 	// Handle AND
@@ -53,6 +33,7 @@ func evalExpression(input *p.Input, r string) bool {
 		}
 		r = r[:andIndex-1] + ans + r[andIndex+2:]
 		andIndex = strings.Index(r, "+")
+		l.Log("CHANGED: "+r, l.LVL2)
 	}
 
 	// Handle OR
@@ -66,15 +47,9 @@ func evalExpression(input *p.Input, r string) bool {
 		orIndex = strings.Index(r, "|")
 	}
 
-	// Handle OR
-	xorIndex := strings.Index(r, "^")
-	for xorIndex != -1 {
-		ans := "0"
-		if r[xorIndex-1]-48 != r[xorIndex+1]-48 {
-			ans = "1"
-		}
-		r = r[:xorIndex-1] + ans + r[xorIndex+2:]
-		xorIndex = strings.Index(r, "^")
+	if r == "1" {
+		return true
+	} else {
+		return false
 	}
-	return r == "1"
 }
