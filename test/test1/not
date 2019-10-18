@@ -1,0 +1,23 @@
+# Basic NOT
+
+B + !C => A
+
+=
+?A
+# Result should be
+# A:False
+
+=B
+?A
+# Result should be
+# A:True
+
+=C
+?A
+# Result should be
+# A:False
+
+=BC
+?A
+# Result should be
+# A:False

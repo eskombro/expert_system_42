@@ -13,6 +13,11 @@ import (
 	"strings"
 )
 
+type Cache struct {
+	Expression string
+	Solution   string
+}
+
 func initializeElementsForQuery(input *p.Input, currentQuery int) {
 	for key := range input.Elements {
 		input.Elements[key] = p.FALSE
@@ -24,7 +29,7 @@ func initializeElementsForQuery(input *p.Input, currentQuery int) {
 }
 
 func main() {
-	parser := argparse.NewParser("gomoku", "Expert System | sjimenez - 42 Paris")
+	parser := argparse.NewParser("Expert Sysem", "Expert System | sjimenez - 42 Paris")
 	file := parser.String("f", "file", &argparse.Options{Required: true, Help: "Path to file", Default: "test/basic/basic"})
 	optionV := parser.Flag("v", "verbose1", &argparse.Options{Help: "Launch program with vorbose level 1"})
 	optionVV := parser.Flag("V", "verbose2", &argparse.Options{Help: "Launch program with vorbose level 2"})
@@ -39,6 +44,12 @@ func main() {
 		l.DebugLevel = 1
 	}
 	input := p.ParseInput(*file)
+
+	fmt.Println("Rules:")
+	for _, r := range input.Rules {
+		fmt.Println(" -", r.Condition, "=>", r.Conclusion, ":", r.DoubleArrow)
+	}
+
 	for currentQuery := range input.Queries {
 
 		initializeElementsForQuery(&input, currentQuery)
@@ -49,12 +60,6 @@ func main() {
 			f := fmt.Sprintf("%c", fact)
 			input.Elements[f] = p.TRUE
 		}
-
-		fmt.Println("Rules:")
-		for _, r := range input.Rules {
-			fmt.Println(" -", r.Condition, "=>", r.Conclusion, ":", r.DoubleArrow)
-		}
-
 		// Handle query
 		q := input.Queries[currentQuery]
 		fmt.Println("Query:", q)
@@ -103,17 +108,14 @@ func main() {
 					}
 					for _, r := range input.Rules {
 						// Contains is not good to handle the AND in Conclusion
-						if r.Conclusion == m {
+						if strings.Contains(r.Conclusion, m) {
 							l.Log("  There is a rule for "+m, l.LVL1)
 							mod += strings.Count(sq, r.Conclusion)
 							sq = strings.ReplaceAll(sq, m, "("+r.Condition+")")
 							l.Log("  -> "+sq, l.LVL1)
-						} else if strings.Contains(r.Conclusion, m) {
-							l.Log("  There is a AND condition containing "+m, l.LVL1)
-							l.Log("    Not implemented yet ", l.LVL1)
-							break
 						}
 					}
+
 				}
 				// Test if end of search
 				orig := fmt.Sprintf("%c", subQuery)
@@ -121,8 +123,8 @@ func main() {
 				matches = alpha.FindAllString(sq, -1)
 				matchesNot = alphaNot.FindAllString(sq, -1)
 				if mod == 0 && len(matches)+len(matchesNot) > 0 {
-					l.Log("  SOULTION for "+orig+" is FALSE", l.LVL1)
-					fmt.Println(orig, ":", false)
+					l.Log("  Calculating SOLUTION for "+orig+": "+sq, l.LVL1)
+					fmt.Println(orig, ":", ev.EvalExpression(sq))
 					break
 				}
 				if len(matches)+len(matchesNot) == 0 {

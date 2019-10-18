@@ -33,4 +33,11 @@ func TestEvalExpression(t *testing.T) {
 			t.Errorf("Error evaluating: %s", expr)
 		}
 	}
+	expr = []string{"((1^1)+((1^1)))", "((1^0)+((1^0)))"}
+	res = []bool{false, true}
+	for i, expr := range expr {
+		if EvalExpression(expr) != res[i] {
+			t.Errorf("Error evaluating: %s", expr)
+		}
+	}
 }

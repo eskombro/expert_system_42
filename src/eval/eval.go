@@ -9,6 +9,11 @@ import (
 
 func EvalExpression(r string) bool {
 	l.Log(r, l.LVL2)
+	alpha := regexp.MustCompile("[A-Z]")
+	matches := alpha.FindAllString(r, -1)
+	for _, m := range matches {
+		r = strings.ReplaceAll(r, m, "0")
+	}
 	for strings.Contains(r, "(") {
 		subExpr := regexp.MustCompile(`\([0-9+|^!]+\)`)
 		m := subExpr.FindAllString(r, -1)
@@ -45,6 +50,17 @@ func EvalExpression(r string) bool {
 		}
 		r = r[:orIndex-1] + ans + r[orIndex+2:]
 		orIndex = strings.Index(r, "|")
+	}
+
+	// Handle XOR
+	xorIndex := strings.Index(r, "^")
+	for xorIndex != -1 {
+		ans := "0"
+		if r[xorIndex-1]-48 != r[xorIndex+1]-48 {
+			ans = "1"
+		}
+		r = r[:xorIndex-1] + ans + r[xorIndex+2:]
+		xorIndex = strings.Index(r, "|")
 	}
 
 	if r == "1" {
