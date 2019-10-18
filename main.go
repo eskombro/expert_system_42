@@ -4,6 +4,9 @@ import (
 	ev "expert_system_42/src/eval"
 	l "expert_system_42/src/logger"
 	p "expert_system_42/src/parser"
+
+	"github.com/akamensky/argparse"
+
 	"fmt"
 	"os"
 	"regexp"
@@ -21,13 +24,21 @@ func initializeElementsForQuery(input *p.Input, currentQuery int) {
 }
 
 func main() {
-	l.DebugLevel = 2
-	fmt.Println("Launching expert system...")
-	if len(os.Args) != 2 {
-		fmt.Println("Error in args. Bye :)")
+	parser := argparse.NewParser("gomoku", "Expert System | sjimenez - 42 Paris")
+	file := parser.String("f", "file", &argparse.Options{Required: true, Help: "Path to file", Default: "test/basic/basic"})
+	optionV := parser.Flag("v", "verbose1", &argparse.Options{Help: "Launch program with vorbose level 1"})
+	optionVV := parser.Flag("V", "verbose2", &argparse.Options{Help: "Launch program with vorbose level 2"})
+	err := parser.Parse(os.Args)
+	if err != nil {
+		fmt.Print(parser.Usage(err))
 		os.Exit(1)
 	}
-	input := p.ParseInput(os.Args[1])
+	if *optionVV {
+		l.DebugLevel = 2
+	} else if *optionV {
+		l.DebugLevel = 1
+	}
+	input := p.ParseInput(*file)
 	for currentQuery := range input.Queries {
 
 		initializeElementsForQuery(&input, currentQuery)
