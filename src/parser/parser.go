@@ -39,15 +39,25 @@ func checkRuleSyntax(line *string) {
 
 func formatRule(line string) *graph.Rule {
 	r := graph.Rule{}
-	// if strings.Contains(line, "<=>") {
-	// 	r.DoubleArrow = true
-	// }
 	line = strings.ReplaceAll(line, "<", "")
 	line = strings.ReplaceAll(line, ">", "")
 	index := strings.Index(line, "=")
 	r.Condition = line[:index]
 	r.Conclusion = line[index+1:]
 	return &r
+}
+
+func formatRuleIfBidirectional(line string) *graph.Rule {
+	r := graph.Rule{}
+	if strings.Contains(line, "<=>") {
+		line = strings.ReplaceAll(line, "<", "")
+		line = strings.ReplaceAll(line, ">", "")
+		index := strings.Index(line, "=")
+		r.Conclusion = line[:index]
+		r.Condition = line[index+1:]
+		return &r
+	}
+	return nil
 }
 
 func initializeNodesMap(gr *graph.Graph, line *string) {
@@ -124,6 +134,10 @@ func ParseInput(filePath string) graph.Graph {
 			checkRuleSyntax(&line)
 			r := formatRule(line)
 			rules = append(rules, r)
+			r2 := formatRuleIfBidirectional(line)
+			if r2 != nil {
+				rules = append(rules, r2)
+			}
 		} else {
 			if isFact {
 				gr.Facts = append(gr.Facts, line[1:])
@@ -137,6 +151,5 @@ func ParseInput(filePath string) graph.Graph {
 	}
 	checkValidInput(&gr, rules)
 	initializeNodesRules(&gr, rules)
-	fmt.Println(gr)
 	return gr
 }

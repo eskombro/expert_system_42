@@ -21,3 +21,9 @@ type Rule struct {
 	Condition  string
 	Conclusion string
 }
+
+func InitializeNodesStatus(gr *Graph) {
+	for _, node := range gr.Nodes {
+		node.Status = UNDEF
+	}
+}
