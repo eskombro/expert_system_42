@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+var RulesStrPrint string = ""
+
 func cleanLine(line string) string {
 	// Delete comments
 	commentStart := strings.Index(line, "#")
@@ -132,6 +134,7 @@ func ParseInput(filePath string) graph.Graph {
 		// Append rule / facts / query
 		if readingRules {
 			checkRuleSyntax(&line)
+			RulesStrPrint += "\n" + line
 			r := formatRule(line)
 			rules = append(rules, r)
 			r2 := formatRuleIfBidirectional(line)

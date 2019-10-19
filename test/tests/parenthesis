@@ -26,7 +26,7 @@ A | B + C => E
 =AC
 ?E
 # Result should be
-# E:False
+# E:True
 
 =BC
 ?E
