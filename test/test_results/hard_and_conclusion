@@ -1,0 +1,11 @@
+RULES:
+
+L+M=>K
+O+P=>L+N
+N=>M
+
+FACTS:
+=OP
+
+K: true
+

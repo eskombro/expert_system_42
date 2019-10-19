@@ -1,0 +1,60 @@
+RULES:
+
+A|B+C=>E
+(F|G)+H=>E
+
+FACTS:
+=
+
+E: false
+
+FACTS:
+=A
+
+E: true
+
+FACTS:
+=B
+
+E: false
+
+FACTS:
+=C
+
+E: false
+
+FACTS:
+=AC
+
+E: true
+
+FACTS:
+=BC
+
+E: true
+
+FACTS:
+=F
+
+E: false
+
+FACTS:
+=G
+
+E: false
+
+FACTS:
+=H
+
+E: false
+
+FACTS:
+=FH
+
+E: true
+
+FACTS:
+=GH
+
+E: true
+

@@ -1,0 +1,14 @@
+RULES:
+
+A<=>B
+
+FACTS:
+=B
+
+A: true
+
+FACTS:
+=A
+
+B: true
+

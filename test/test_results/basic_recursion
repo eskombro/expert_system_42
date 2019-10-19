@@ -1,0 +1,10 @@
+RULES:
+
+A=>B
+B=>A
+
+FACTS:
+=A
+
+B: true
+

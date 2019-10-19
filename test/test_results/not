@@ -1,0 +1,24 @@
+RULES:
+
+B+!C=>A
+
+FACTS:
+=
+
+A: false
+
+FACTS:
+=B
+
+A: true
+
+FACTS:
+=C
+
+A: false
+
+FACTS:
+=BC
+
+A: false
+

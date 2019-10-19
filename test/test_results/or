@@ -1,0 +1,26 @@
+RULES:
+
+B+C=>A
+D|E=>B
+B=>C
+
+FACTS:
+=
+
+A: false
+
+FACTS:
+=D
+
+A: true
+
+FACTS:
+=E
+
+A: true
+
+FACTS:
+=DE
+
+A: true
+
