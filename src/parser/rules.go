@@ -12,6 +12,7 @@ func checkRuleSyntax(line *string) {
 	if strings.Count(*line, "=>") != 1 {
 		throwParsingLineError("Rule is not well formated", *line)
 	}
+	// Check empty side
 	checkLine := strings.Index(*line, "=>")
 	if checkLine == 0 || checkLine == len(*line)-2 {
 		throwParsingLineError("Rule is not well formated at both sides", *line)
@@ -41,6 +42,20 @@ func formatRule(line string) *graph.Rule {
 	index := strings.Index(line, "=")
 	r.Condition = line[:index]
 	r.Conclusion = line[index+1:]
+	checkUnmatchedParenthesis(&r.Condition)
+	checkUnmatchedParenthesis(&r.Conclusion)
+
+	// Check not contiguous facts
+	contiguousFacts := regexp.MustCompile(`[A-Z]{2,}`)
+	m := contiguousFacts.FindAllString(r.Condition, -1)
+	if len(m) > 0 {
+		throwParsingLineError("There are contiguous facts", line)
+	}
+	m = contiguousFacts.FindAllString(r.Conclusion, -1)
+	if len(m) > 0 {
+		throwParsingLineError("There are contiguous facts", line)
+	}
+
 	return &r
 }
 

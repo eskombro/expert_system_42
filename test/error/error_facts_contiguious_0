@@ -1,0 +1,8 @@
+# Error facts contiguous
+
+A + BC => C
+
+=AB
+?C
+# Result should be
+# Error

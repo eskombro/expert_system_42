@@ -27,6 +27,7 @@ func ParseInput(filePath string) graph.Graph {
 		if len(line) == 0 {
 			continue
 		}
+		checkLineFormat(&line)
 		readingRules, isFact, isQuery := checkLineOrder(&line)
 		// Append rule / facts / query
 		if readingRules {

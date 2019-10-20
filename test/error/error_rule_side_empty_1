@@ -1,8 +1,9 @@
-# Error Syntax 3
+# Error rule side empty
 
+A =>
 B => A
 
 =B
-??A
+?A
 # Result should be
 # Error

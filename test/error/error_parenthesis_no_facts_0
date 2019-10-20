@@ -1,0 +1,8 @@
+# Error parenthesis no facts
+
+A + B + (+) => C
+
+=AB
+?C
+# Result should be
+# Error

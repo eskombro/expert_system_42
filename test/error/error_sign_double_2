@@ -1,9 +1,8 @@
-# Error syntax 5
+# Error double sign
 
-A =>
 B => A
 
 =B
-?A
+??A
 # Result should be
 # Error

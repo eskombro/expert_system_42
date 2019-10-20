@@ -1,0 +1,8 @@
+# Error operators contiguous
+
+A +| B=> C
+
+=AB
+?C
+# Result should be
+# Error

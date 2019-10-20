@@ -1,0 +1,8 @@
+# Error parenthesis empty
+
+() A + B => C
+
+=AB
+?C
+# Result should be
+# Error

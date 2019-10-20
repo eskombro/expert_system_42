@@ -1,0 +1,8 @@
+# Error parenthesis mismatched
+
+( A + B ) => C (
+
+=AB
+?C
+# Result should be
+# Error
