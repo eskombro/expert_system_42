@@ -11,18 +11,29 @@ It can contain comments preceded by `#`
 ## Usage
 
 ```
-usage: Expert System [-h|--help] -f|--file "<value>" [-v|--verbose1]
-                    [-V|--verbose2]
+usage: Expert System [-h|--help] [-f|--file "<value>" [-f|--file "<value>" ...]]
+                    [-v|--verbose1] [-V|--verbose2]
 
                     Expert System | 42 Paris
 
 Arguments:
 
   -h  --help      Print help information
-  -f  --file      Path to file
+  -f  --file      list of paths to file
   -v  --verbose1  Launch program with verbose level 1
   -V  --verbose2  Launch program with verbose level 2
 ```
+  
+## Examples
+
+- Single file  
+`go run expert_system -f test/tests/and`  
+
+- Multiple files  
+`go run expert_system -f test/tests/and -f test/tests/basic_biconditional`  
+
+- Verbose  
+`go run expert_system -f test/tests/parenthesis -V`  
 
 ## Input file example  
 

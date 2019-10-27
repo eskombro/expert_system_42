@@ -9,20 +9,18 @@ import (
 	"os"
 )
 
-func HandleArgs() *string {
+func HandleArgs() *[]string {
 	parser := argparse.NewParser(
-		"Expert Sysem", "Expert System | sjimenez - 42 Paris",
+		"Expert Sysem", "Expert System | 42 Paris",
 	)
-	file := parser.String("f", "file", &argparse.Options{
-		Required: true,
-		Help:     "Path to file",
-		Default:  "test/basic/basic",
+	file := parser.List("f", "file", &argparse.Options{
+		Help: "list of paths to file",
 	})
 	optionV := parser.Flag("v", "verbose1", &argparse.Options{
-		Help: "Launch program with vorbose level 1",
+		Help: "Launch program with verbose level 1",
 	})
 	optionVV := parser.Flag("V", "verbose2", &argparse.Options{
-		Help: "Launch program with vorbose level 2",
+		Help: "Launch program with verbose level 2",
 	})
 	err := parser.Parse(os.Args)
 	if err != nil {
